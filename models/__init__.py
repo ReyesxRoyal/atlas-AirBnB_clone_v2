@@ -1,13 +1,17 @@
 #!/usr/bin/python3
-# models/__init__.py
-from os import getenv
+# models/city.py
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship
 
-if getenv('HBNB_TYPE_STORAGE') == 'db':
-    from models.engine.db_storage import DBStorage
-    storage = DBStorage()
-else:
-    from models.engine.file_storage import FileStorage
-    storage = FileStorage()
+from models.base_model import BaseModel, Base
 
-storage.reload()
+
+class City(BaseModel, Base):
+
+    """Representation of city"""
+    __tablename__ = 'cities'
+
+    name = Column(String(128), nullable=False)
+    state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
+
 
