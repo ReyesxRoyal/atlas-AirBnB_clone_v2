@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+ #!/usr/bin/python3
 # models/state.py
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
@@ -13,6 +13,7 @@ class State(BaseModel, Base):
 
     name = Column(String(128), nullable=False)
 
+    # Relationship for DBStorage
     if getenv('HBNB_TYPE_STORAGE') == 'db':
         cities = relationship('City', cascade='all, delete', backref='state')
     else:
@@ -33,3 +34,4 @@ class State(BaseModel, Base):
     def __init__(self, *args, **kwargs):
         """Initializes state instance"""
         super().__init__(*args, **kwargs)
+
