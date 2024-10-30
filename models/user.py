@@ -1,29 +1,34 @@
 #!/usr/bin/python3
-""" Review module for the HBNB project """
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
 
-class Review(BaseModel, Base):
-    """ Review class to store review information """
-    __tablename__ = 'reviews'
-    
-    text = Column(String(1024), nullable=False)
-    place_id = Column(String(60), ForeignKey('places.id'), nullable=False)
-    user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
+class User(BaseModel, Base):
+    """Representation of a user"""
+    __tablename__ = 'users'
+
+    email = Column(String(128), nullable=False)
+    password = Column(String(128), nullable=False)
+    first_name = Column(String(128), nullable=True)
+    last_name = Column(String(128), nullable=True)
+
+    # Relationship with Review
+    reviews = relationship("Review", cascade="all, delete-orphan", backref="user")
 
     def __init__(self, *args, **kwargs):
-        """Initializes the review instance"""
+        """Initializes user instance"""
         super().__init__(*args, **kwargs)
 
     def to_dict(self):
-        """Return a dictionary representation of the Review instance"""
-        review_dict = super().to_dict()  # Call to_dict of BaseModel
-        review_dict.update({
-            'text': self.text,
-            'place_id': self.place_id,
-            'user_id': self.user_id,
+        """Return a dictionary representation of the User instance"""
+        user_dict = super().to_dict()  # Call to_dict of BaseModel
+        user_dict.update({
+            'email': self.email,
+            'password': self.password,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
         })
-        return review_dict
+        return user_dict
 
 
 
