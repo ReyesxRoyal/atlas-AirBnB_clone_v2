@@ -1,7 +1,13 @@
 #!/usr/bin/python3
-from sqlalchemy import Column, String, ForeignKey, Integer, Float
+from sqlalchemy import Column, String, ForeignKey, Integer, Float, Table
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
+
+# Define the association table for the Many-To-Many relationship
+place_amenity = Table('place_amenity', Base.metadata,
+    Column('place_id', String(60), ForeignKey('places.id'), primary_key=True, nullable=False),
+    Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True, nullable=False)
+)
 
 class Place(BaseModel, Base):
     """Representation of a place"""
@@ -20,6 +26,21 @@ class Place(BaseModel, Base):
 
     # Relationship with Review
     reviews = relationship("Review", cascade="all, delete-orphan", backref="place")
+    
+    # DBStorage: Many-To-Many relationship with Amenity
+    amenities = relationship("Amenity", secondary=place_amenity, viewonly=False, backref="places")
+
+    # FileStorage: getter and setter for amenities
+    @property
+    def amenities(self):
+        """Return the list of Amenity instances linked to this Place"""
+        return [Amenity.get(amenity_id) for amenity_id in self.amenity_ids]
+
+    @amenities.setter
+    def amenities(self, amenity):
+        """Add an Amenity.id to the amenity_ids"""
+        if isinstance(amenity, Amenity):
+            self.amenity_ids.append(amenity.id)
 
     def __init__(self, *args, **kwargs):
         """Initializes the place instance"""
@@ -39,6 +60,7 @@ class Place(BaseModel, Base):
             'price_by_night': self.price_by_night,
             'latitude': self.latitude,
             'longitude': self.longitude,
+            'amenity_ids': self.amenity_ids,  # Include amenity_ids in the dict
         })
         return place_dict
 
